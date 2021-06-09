@@ -1,2 +1,4 @@
 # SynthesisOfLight
-# Test
+
+1) Any update to the Asgaros plugin which touches the forum-reactions.php will likely remove our changes.  The new file will need to be compared against our saved version and the necessary changes made, committed, and applied to production. (Eduardo) 
+
