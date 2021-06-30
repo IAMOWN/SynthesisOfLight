@@ -4,3 +4,8 @@
 https://github.com/IAMOWN/SynthesisOfLight/blob/main/wp-content/plugins/asgaros-forum/includes/forum-reactions.php
 (Eduardo) 
 
+2) Files changed to replace "Banned" with "Paused":
+forum-reactions.php
+forum-profile.php
+forum-memberslist.php
+(Eduardo)
