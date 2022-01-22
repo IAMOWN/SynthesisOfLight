@@ -383,7 +383,6 @@ class AsgarosForumPermissions {
             return true;
         }
 
-
         if ($this->isAdministrator($user_id)) {
             // Administrators cannot ban other (site) administrators.
             if ($this->isAdministrator($ban_id)) {
@@ -455,7 +454,7 @@ class AsgarosForumPermissions {
 
     public function ban_user($user_id, $ban_id) {
         // Verify nonce first.
-        if (wp_verify_nonce($_REQUEST['_wpnonce'], 'ban_user_'.$ban_id)) {
+        if (wp_verify_nonce(sanitize_key($_REQUEST['_wpnonce']), 'ban_user_'.$ban_id)) {
             // Check if the current user can ban another user.
             if ($this->can_ban_user($user_id, $ban_id)) {
                 // Ensure that the user is not already banned.
@@ -468,7 +467,7 @@ class AsgarosForumPermissions {
 
     public function unban_user($user_id, $unban_id) {
         // Verify nonce first.
-        if (wp_verify_nonce($_REQUEST['_wpnonce'], 'unban_user_'.$unban_id)) {
+        if (wp_verify_nonce(sanitize_key($_REQUEST['_wpnonce']), 'unban_user_'.$unban_id)) {
             // Check if the current user can ban another user.
             if ($this->can_ban_user($user_id, $unban_id)) {
                 // Ensure that the user is banned.
@@ -482,14 +481,14 @@ class AsgarosForumPermissions {
     public function change_ban_status() {
         if (!empty($_GET['ban_user'])) {
             $user_id = get_current_user_id();
-            $ban_id = $_GET['ban_user'];
+            $ban_id = sanitize_key($_GET['ban_user']);
 
             $this->ban_user($user_id, $ban_id);
         }
 
         if (!empty($_GET['unban_user'])) {
             $user_id = get_current_user_id();
-            $unban_id = $_GET['unban_user'];
+            $unban_id = sanitize_key($_GET['unban_user']);
 
             $this->unban_user($user_id, $unban_id);
         }
@@ -607,7 +606,7 @@ class AsgarosForumPermissions {
         if (!$this->asgarosforum->prevent_query_modifications) {
             if ($pagenow == 'users.php') {
                 if (!empty($_GET['forum-user-role'])) {
-        			$role = $_GET['forum-user-role'];
+        			$role = sanitize_key($_GET['forum-user-role']);
                     $users = $this->get_users_by_role($role);
 
                     if (!empty($users)) {
@@ -675,7 +674,7 @@ class AsgarosForumPermissions {
 
     public function bulk_actions_admin_notices() {
         if (!empty($_REQUEST['forum_role_assigned'])) {
-            printf('<div class="updated"><p>'.__('Forum role assigned.', 'asgaros-forum').'</p></div>');
+            printf('<div class="updated"><p>'.esc_html__('Forum role assigned.', 'asgaros-forum').'</p></div>');
         }
     }
 }

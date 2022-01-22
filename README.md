@@ -12,3 +12,9 @@ forum-reactions.php
 forum-profile.php
 forum-memberslist.php
 (Eduardo)
+
+3) Updating file changes from plugin updates:
+forum-profile.php
+forum-memberslist.php
+forum-permissions.php
+(Eduardo)

@@ -69,11 +69,11 @@ class AsgarosForumProfile {
     }
 
     public function show_profile_header($user_data) {
-        $userOnline = ($this->asgarosforum->online->is_user_online($user_data->ID)) ? ' class="user-online"' : '';
+        $userOnline = ($this->asgarosforum->online->is_user_online($user_data->ID)) ? 'user-online' : 'user-offline';
         $background_style = '';
         $user_id = $user_data->ID;
 
-        echo '<div id="profile-header"'.$userOnline.'>';
+        echo '<div id="profile-header" class="'.esc_attr($userOnline).'">';
             if ($this->asgarosforum->options['enable_avatars']) {
 
                 $url = get_avatar_url($user_id, 480);
@@ -84,7 +84,7 @@ class AsgarosForumProfile {
                 $background_style = 'style="background-image: url(\''.$url.'\');"';
             }
 
-            echo '<div class="background-avatar" '.$background_style.'></div>';
+            echo '<div class="background-avatar" '.wp_kses_post($background_style).'></div>';
             echo '<div class="background-contrast"></div>';
 
             // Show avatar.
@@ -93,21 +93,22 @@ class AsgarosForumProfile {
             }
 
             echo '<div class="user-info">';
-
                 $user_name = apply_filters('asgarosforum_filter_username', $user_data->display_name, $user_data);
-                echo '<div class="profile-display-name">'.$user_name.'</div>';
-
-                $role = $this->asgarosforum->permissions->getForumRole($user_id);
-
-                // Special styling for banned users.
-                if ($this->asgarosforum->permissions->get_forum_role($user_id) === 'banned') {
-                    $role = '<span class="banned">'.$role.'</span>';
-                }
+                echo '<div class="profile-display-name">'.esc_html($user_name).'</div>';
 
                 echo '<div class="profile-forum-role">';
                 $count_posts = $this->asgarosforum->countPostsByUser($user_id);
                 $this->asgarosforum->render_reputation_badges($count_posts);
-                echo $role;
+
+				$role = $this->asgarosforum->permissions->getForumRole($user_id);
+
+                // Special styling for banned users.
+                if ($this->asgarosforum->permissions->get_forum_role($user_id) === 'banned') {
+                    echo '<span class="banned">'.esc_html($role).'</span>';
+                } else {
+					echo esc_html($role);
+				}
+
                 echo '</div>';
             echo '</div>';
         echo '</div>';
@@ -120,16 +121,16 @@ class AsgarosForumProfile {
 
             // Profile link.
             if ($this->asgarosforum->current_view === 'profile') {
-                echo '<a class="active" href="'.$profile_link.'">'.__('Profile', 'asgaros-forum').'</a>';
+                echo '<a class="active" href="'.esc_url($profile_link).'">'.esc_html__('Profile', 'asgaros-forum').'</a>';
             } else {
-                echo '<a href="'.$profile_link.'">'.__('Profile', 'asgaros-forum').'</a>';
+                echo '<a href="'.esc_url($profile_link).'">'.esc_html__('Profile', 'asgaros-forum').'</a>';
             }
 
             // Subscriptions link.
             if ($this->asgarosforum->current_view === 'history') {
-                echo '<a class="active" href="'.$history_link.'">'.__('Post History', 'asgaros-forum').'</a>';
+                echo '<a class="active" href="'.esc_url($history_link).'">'.esc_html__('Post History', 'asgaros-forum').'</a>';
             } else {
-                echo '<a href="'.$history_link.'">'.__('Post History', 'asgaros-forum').'</a>';
+                echo '<a href="'.esc_url($history_link).'">'.esc_html__('Post History', 'asgaros-forum').'</a>';
             }
 
             do_action('asgarosforum_custom_profile_menu');
@@ -172,7 +173,7 @@ class AsgarosForumProfile {
 
         if ($userData) {
             if ($this->hideProfileLink()) {
-                _e('You need to login to have access to profiles.', 'asgaros-forum');
+                esc_html_e('You need to login to have access to profiles.', 'asgaros-forum');
             } else {
                 $this->show_profile_header($userData);
                 $this->show_profile_navigation($userData);
@@ -181,7 +182,7 @@ class AsgarosForumProfile {
                     $posts = $this->get_post_history_by_user($user_id, true);
 
                     if (empty($posts)) {
-                        _e('No posts made by this user.', 'asgaros-forum');
+                        esc_html_e('No posts made by this user.', 'asgaros-forum');
                     } else {
                         $pagination = $this->asgarosforum->pagination->renderPagination('history', $user_id);
 
@@ -193,19 +194,20 @@ class AsgarosForumProfile {
                             echo '<div class="history-element">';
                                 echo '<div class="history-name">';
                                     $link = $this->asgarosforum->rewrite->get_post_link($post->id, $post->parent_id);
-                                    $text = esc_html(stripslashes(strip_tags($post->text)));
-                                    $text = $this->asgarosforum->cut_string($text, 100);
 
-                                    echo '<a class="history-title" href="'.$link.'">'.$text.'</a>';
+                                    echo '<a class="history-title" href="'.esc_url($link).'">';
+									echo esc_html($this->asgarosforum->cut_string(esc_html(stripslashes(strip_tags($post->text))), 100));
+									echo '</a>';
 
                                     $topic_link = $this->asgarosforum->rewrite->get_link('topic', $post->parent_id);
-                                    $topic_name = esc_html(stripslashes($post->name));
                                     $topic_time = $this->asgarosforum->get_activity_timestamp($post->date);
 
-                                    echo '<span class="history-topic">'.__('In:', 'asgaros-forum').' <a href="'.$topic_link.'">'.$topic_name.'</a></span>';
+                                    echo '<span class="history-topic">'.esc_html__('In:', 'asgaros-forum').' <a href="'.esc_url($topic_link).'">';
+									echo esc_html(stripslashes($post->name));
+									echo '</a></span>';
                                 echo '</div>';
 
-                                echo '<div class="history-time">'.$topic_time.'</div>';
+                                echo '<div class="history-time">'.esc_html($topic_time).'</div>';
                             echo '</div>';
                         }
 
@@ -216,7 +218,7 @@ class AsgarosForumProfile {
                 echo '</div>';
             }
         } else {
-            _e('This user does not exist.', 'asgaros-forum');
+            esc_html_e('This user does not exist.', 'asgaros-forum');
         }
     }
 
@@ -227,7 +229,7 @@ class AsgarosForumProfile {
 
         if ($userData) {
             if ($this->hideProfileLink()) {
-                _e('You need to login to have access to profiles.', 'asgaros-forum');
+                esc_html_e('You need to login to have access to profiles.', 'asgaros-forum');
             } else {
                 $this->show_profile_header($userData);
                 $this->show_profile_navigation($userData);
@@ -309,7 +311,7 @@ class AsgarosForumProfile {
 
                     echo '<div class="profile-section-header">';
                         echo '<span class="profile-section-header-icon fas fa-address-card"></span>';
-                        echo __('Member Activity', 'asgaros-forum');
+                        echo esc_html__('Member Activity', 'asgaros-forum');
                     echo '</div>';
 
                     echo '<div class="profile-section-content">';
@@ -334,9 +336,9 @@ class AsgarosForumProfile {
                     $current_user_id = get_current_user_id();
 
                     if ($userData->ID == $current_user_id) {
-                        echo '<a href="'.get_edit_profile_url().'" class="edit-profile-link">';
+                        echo '<a href="'.esc_url(get_edit_profile_url()).'" class="edit-profile-link">';
                             echo '<span class="fas fa-pencil-alt"></span>';
-                            echo __('Edit Profile', 'asgaros-forum');
+                            echo esc_html__('Edit Profile', 'asgaros-forum');
                         echo '</a>';
                     }
 
@@ -345,35 +347,35 @@ class AsgarosForumProfile {
                         if ($this->asgarosforum->permissions->isBanned($userData->ID)) {
                             $url = $this->getProfileLink($userData, array('unban_user' => $userData->ID));
                             $nonce_url = wp_nonce_url($url, 'unban_user_'.$userData->ID);
-                            echo '<a class="banned" href="'.$nonce_url.'">'.__('Unpause User', 'asgaros-forum').'</a>';
+                            echo '<a class="banned" href="'.esc_url($nonce_url).'">'.esc_html__('Unpause User', 'asgaros-forum').'</a>';
                         } else {
                             $url = $this->getProfileLink($userData, array('ban_user' => $userData->ID));
                             $nonce_url = wp_nonce_url($url, 'ban_user_'.$userData->ID);
-                            echo '<a class="banned" href="'.$nonce_url.'">'.__('Pause User', 'asgaros-forum').'</a>';
+                            echo '<a class="banned" href="'.esc_url($nonce_url).'">'.esc_html__('Pause User', 'asgaros-forum').'</a>';
                         }
                     }
                 echo '</div>';
             }
         } else {
-            _e('This user does not exist.', 'asgaros-forum');
+            esc_html_e('This user does not exist.', 'asgaros-forum');
         }
     }
 
     public function renderProfileRow($cellTitle, $cellValue, $type = '') {
         echo '<div class="profile-row">';
-            echo '<div>'.$cellTitle.'</div>';
+            echo '<div>'.esc_html($cellTitle).'</div>';
             echo '<div>';
 
             if (is_array($cellValue)) {
                 foreach ($cellValue as $value) {
                     if ($type == 'usergroups') {
-                        echo AsgarosForumUserGroups::render_usergroup_tag($value);
+                        echo wp_kses_post(AsgarosForumUserGroups::render_usergroup_tag($value));
                     } else {
-                        echo $value.'<br>';
+                        echo wp_kses_post($value).'<br>';
                     }
                 }
             } else {
-                echo $cellValue;
+                echo wp_kses_post($cellValue);
             }
 
             echo '</div>';
