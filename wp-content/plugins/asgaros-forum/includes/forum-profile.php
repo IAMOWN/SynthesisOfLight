@@ -236,7 +236,7 @@ class AsgarosForumProfile {
 
                 echo '<div id="profile-content">';
                     // Defines an array for profile rows.
-                    $profileRows = array ();
+                    $profileRows = array();
 
                     // Show first name.
                     if (!empty($userData->first_name)) {
@@ -299,8 +299,8 @@ class AsgarosForumProfile {
 
                     $profileRows = apply_filters('asgarosforum_filter_profile_row', $profileRows, $userData);
 
-                    foreach ($profileRows as $profileRow){
-                        if (!empty($profileRow['type'])){
+                    foreach ($profileRows as $profileRow) {
+                        if (!empty($profileRow['type'])) {
                             $this->renderProfileRow($profileRow['title'], $profileRow['value'], $profileRow['type']);
                         } else {
                             $this->renderProfileRow($profileRow['title'], $profileRow['value']);
